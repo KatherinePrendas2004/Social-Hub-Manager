@@ -34,4 +34,19 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'twitter' => [
+        'client_id' => env('TWITTER_CLIENT_ID'),
+        'client_secret' => env('TWITTER_CLIENT_SECRET'),
+        'redirect' => env('TWITTER_REDIRECT_URI'),
+    ],
+    'linkedin' => [
+        'client_id' => env('LINKEDIN_CLIENT_ID'),
+        'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
+        'redirect' => env('LINKEDIN_REDIRECT_URI'),
+    ],
+    'reddit' => [
+        'client_id' => env('REDDIT_CLIENT_ID'),
+        'client_secret' => env('REDDIT_CLIENT_SECRET'),
+        'redirect' => env('REDDIT_REDIRECT_URI'),
+    ],
 ];
