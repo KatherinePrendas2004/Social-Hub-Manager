@@ -18,9 +18,6 @@ class PostPublishService
         $this->oauthService = $oauthService;
     }
 
-    /**
-     * Publicar post instantáneamente
-     */
     public function publishInstant(Post $post)
     {
         $post->update(['status' => 'publishing']);
@@ -55,9 +52,6 @@ class PostPublishService
         return $results;
     }
 
-    /**
-     * Publicar en una plataforma específica
-     */
     private function publishToPlatform(Post $post, string $platform)
     {
         $account = SocialAccount::where('user_id', $post->user_id)
@@ -84,15 +78,12 @@ class PostPublishService
             case 'linkedin':
                 return $this->publishToLinkedIn($post, $account, $accessToken);
             case 'reddit':
-                return $this->publishToReddit($post, $accessToken);
+                return $this->publishToReddit($post, $account, $accessToken);
             default:
                 throw new \Exception("Plataforma no soportada: {$platform}");
         }
     }
 
-    /**
-     * Publicar en Twitter
-     */
     private function publishToTwitter(Post $post, string $accessToken)
     {
         $payload = ['text' => $post->content];
@@ -113,15 +104,11 @@ class PostPublishService
         ];
     }
 
-    /**
-     * Publicar en LinkedIn
-     */
     private function publishToLinkedIn(Post $post, SocialAccount $account, string $accessToken)
     {
         try {
             Log::info('Publishing to LinkedIn', ['post_id' => $post->id]);
             
-            // 1. Obtener información del usuario usando el endpoint correcto
             $userResponse = Http::withToken($accessToken)
                 ->get('https://api.linkedin.com/v2/userinfo');
 
@@ -138,13 +125,11 @@ class PostPublishService
             
             Log::info('User info obtained', ['user_id' => $userId]);
 
-            // 2. Actualizar el platform_user_id si es diferente
             if ($account->platform_user_id !== $userId) {
                 $account->update(['platform_user_id' => $userId]);
                 Log::info('Updated platform_user_id', ['new_id' => $userId]);
             }
 
-            // 3. Preparar el payload para UGC Posts API
             $payload = [
                 'author' => 'urn:li:person:' . $userId,
                 'lifecycleState' => 'PUBLISHED',
@@ -163,7 +148,6 @@ class PostPublishService
 
             Log::info('Posting to LinkedIn UGC API');
 
-            // 4. Publicar usando UGC Posts API
             $response = Http::withToken($accessToken)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
@@ -185,7 +169,6 @@ class PostPublishService
                 ];
             }
 
-            // Si falla, revisar el error específico
             $errorData = $response->json();
             $errorMessage = $errorData['message'] ?? 'Error desconocido';
 
@@ -195,7 +178,6 @@ class PostPublishService
                 'response' => $response->body()
             ]);
 
-            // Mensajes de error más específicos
             if ($response->status() === 403) {
                 if (str_contains($errorMessage, 'w_member_social')) {
                     throw new \Exception('El token no tiene el permiso w_member_social. Reconecta tu cuenta de LinkedIn.');
@@ -220,4 +202,135 @@ class PostPublishService
         }
     }
 
+    private function publishToReddit(Post $post, SocialAccount $account, string $accessToken)
+    {
+        try {
+            Log::info('Intentando publicar en Reddit', [
+                'post_id' => $post->id,
+                'title' => $post->reddit_title,
+                'content' => $post->content,
+                'username' => $account->platform_username,
+            ]);
+
+            if (!$post->reddit_title) {
+                throw new \Exception('Se requiere un título para publicar en Reddit.');
+            }
+
+            if (!$account->platform_username) {
+                throw new \Exception('No se encontró el nombre de usuario de Reddit. Re-conecta la cuenta.');
+            }
+
+            $payload = [
+                'kind' => 'self',
+                'sr' => 'u_' . $account->platform_username, 
+                'title' => $post->reddit_title,
+                'text' => $post->content,
+            ];
+
+            Log::info('Enviando solicitud a Reddit API', [
+                'post_id' => $post->id,
+                'payload' => $payload,
+            ]);
+
+            $response = Http::withToken($accessToken)
+                ->withHeaders([
+                    'User-Agent' => 'SocialHubManager/1.0 by ' . $account->platform_username,
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ])
+                ->asForm()
+                ->post('https://oauth.reddit.com/api/submit', $payload);
+
+            Log::info('Respuesta de Reddit API recibida', [
+                'post_id' => $post->id,
+                'status' => $response->status(),
+                'headers' => $response->headers(),
+                'body' => $response->body(),
+            ]);
+
+            if (!$response->successful()) {
+                throw new \Exception('Error en Reddit API: ' . $response->body());
+            }
+
+            $data = $response->json();
+
+            if (isset($data['json']['errors']) && !empty($data['json']['errors'])) {
+                Log::error('Errores en la respuesta de Reddit API', [
+                    'post_id' => $post->id,
+                    'errors' => $data['json']['errors'],
+                ]);
+                throw new \Exception('Errores en Reddit API: ' . json_encode($data['json']['errors']));
+            }
+
+            if (isset($data['success']) && !$data['success']) {
+                throw new \Exception('Reddit API indicó fallo en la publicación');
+            }
+
+            $postId = null;
+            $postUrl = null;
+
+            if (isset($data['json']['data']['id'])) {
+                $postId = $data['json']['data']['id'];
+                $postUrl = $data['json']['data']['url'] ?? null;
+            }
+            elseif (isset($data['jquery']) && is_array($data['jquery'])) {
+                foreach ($data['jquery'] as $instruction) {
+                    if (is_array($instruction) && count($instruction) >= 3 && 
+                        $instruction[1] == 'redirect' || 
+                        (isset($instruction[2]) && $instruction[2] == 'call' && 
+                        isset($instruction[3]) && is_array($instruction[3]) && 
+                        count($instruction[3]) > 0 && strpos($instruction[3][0], 'reddit.com') !== false)) {
+                        
+                        $redirectUrl = null;
+                        if ($instruction[1] == 'redirect' && isset($instruction[2]) && $instruction[2] == 'call') {
+                            $redirectUrl = $instruction[3][0] ?? null;
+                        } elseif (isset($instruction[3][0])) {
+                            $redirectUrl = $instruction[3][0];
+                        }
+                        
+                        if ($redirectUrl && strpos($redirectUrl, 'reddit.com') !== false) {
+                            $postUrl = $redirectUrl;
+                            if (preg_match('/comments\/([a-zA-Z0-9]+)\//', $redirectUrl, $matches)) {
+                                $postId = $matches[1];
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!$postId) {
+                Log::error('No se encontró ID de publicación en la respuesta de Reddit', [
+                    'post_id' => $post->id,
+                    'response' => $data,
+                ]);
+                $postId = 'reddit_' . time();
+                Log::info('Usando ID temporal para la publicación', ['temp_id' => $postId]);
+            }
+
+            Log::info('Publicación en Reddit exitosa', [
+                'post_id' => $post->id,
+                'platform_post_id' => $postId,
+                'post_url' => $postUrl,
+            ]);
+
+            return [
+                'success' => true,
+                'platform_post_id' => $postId,
+                'published_at' => now(),
+                'response' => $data,
+                'extra_info' => [
+                    'title' => $post->reddit_title,
+                    'url' => $postUrl,
+                ],
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Fallo al publicar en Reddit', [
+                'post_id' => $post->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
 }
