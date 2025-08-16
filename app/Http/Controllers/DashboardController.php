@@ -8,7 +8,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-        return view('dashboard.index', compact('user'));
+        $posts = Auth::user()->posts()
+            ->latest()
+            ->paginate(5);
+
+        return view('posts.index', compact('posts'));
     }
 }

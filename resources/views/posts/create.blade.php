@@ -156,19 +156,6 @@
                 @error('platforms')
                     <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                 @enderror
-
-                <!-- Platform Information -->
-                <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <h4 class="text-sm font-semibold text-blue-900 mb-2 flex items-center">
-                        <i data-lucide="info" class="w-4 h-4 mr-2"></i>
-                        Información sobre las plataformas
-                    </h4>
-                    <div class="space-y-2 text-xs text-blue-800">
-                        <p><strong>Twitter:</strong> Tu contenido se publicará como tweet.</p>
-                        <p><strong>LinkedIn:</strong> Se publicará en tu perfil profesional.</p>
-                        <p><strong>Reddit:</strong> Se creará un post de texto en uno de tus subreddits. El título se generará automáticamente basado en tu contenido.</p>
-                    </div>
-                </div>
             </div>
 
             <!-- Publication Type -->

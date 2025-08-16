@@ -30,7 +30,7 @@ class PostController extends Controller
             ->toArray();
 
         if (empty($connectedAccounts)) {
-            return redirect()->route('social.create')
+            return redirect()->route('social.index')
                 ->with('error', 'Debes conectar al menos una red social antes de publicar.');
         }
 
@@ -91,17 +91,17 @@ class PostController extends Controller
                 if ($successful->count() > 0 && $failed->count() === 0) {
                     // Éxito total
                     $message = '¡Publicación enviada exitosamente a todas las redes!' . "\n\n" . implode("\n", $messages);
-                    return redirect()->route('posts.create')->with('success', $message);
+                    return redirect()->route('dashboard.index')->with('success', $message);
                     
                 } elseif ($successful->count() > 0 && $failed->count() > 0) {
                     // Éxito parcial
                     $message = 'Publicación enviada parcialmente. Algunos errores ocurrieron:' . "\n\n" . implode("\n", $messages);
-                    return redirect()->route('posts.create')->with('warning', $message);
+                    return redirect()->route('dashboard.index')->with('warning', $message);
                     
                 } else {
                     // Fallo total
                     $message = 'No se pudo publicar en ninguna red social:' . "\n\n" . implode("\n", $messages);
-                    return redirect()->route('posts.create')->with('error', $message);
+                    return redirect()->route('dashboard.index')->with('error', $message);
                 }
                 
             } catch (\Exception $e) {
@@ -110,13 +110,14 @@ class PostController extends Controller
                     'error' => $e->getMessage()
                 ]);
                 
-                return redirect()->route('posts.create')
+                return redirect()->route('dashboard.index')
                     ->with('error', 'Error inesperado al procesar la publicación: ' . $e->getMessage());
             }
         }
 
         // Para tipos queued y scheduled (no implementados aún)
-        return redirect()->route('posts.create')
+        return redirect()->route('dashboard.index')
             ->with('info', 'Publicación guardada. Las funciones de cola y programación estarán disponibles próximamente.');
     }
+
 }
