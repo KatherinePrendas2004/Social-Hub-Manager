@@ -23,33 +23,61 @@
 
     <!-- Navigation con Scroll -->
     <nav class="px-3 py-4 space-y-2 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+
+        {{-- Dashboard --}}
         <a href="{{ route('dashboard.index') }}" 
-           class="group flex items-center space-x-3 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md transform hover:scale-[1.02] transition-all duration-300">
-            <div class="p-1.5 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors">
-                <i data-lucide="home" class="w-4 h-4"></i>
+           class="group flex items-center space-x-3 px-4 py-3 rounded-xl 
+                {{ request()->routeIs('dashboard.index') 
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md transform hover:scale-[1.02]' 
+                    : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 hover:text-blue-700 hover:shadow-sm' }} transition-all duration-300">
+            <div class="p-1.5 rounded-lg transition-colors
+                {{ request()->routeIs('dashboard.index') 
+                    ? 'bg-white/20 group-hover:bg-white/30' 
+                    : 'bg-gray-100 group-hover:bg-blue-100' }}">
+                <i data-lucide="home" class="w-4 h-4 transition-colors
+                    {{ request()->routeIs('dashboard.index') ? '' : 'group-hover:text-blue-600' }}"></i>
             </div>
             <span class="font-medium text-sm">Dashboard</span>
-            <div class="ml-auto">
-                <div class="w-1.5 h-1.5 bg-white/70 rounded-full"></div>
-            </div>
+            @if(request()->routeIs('dashboard.index'))
+                <div class="ml-auto">
+                    <div class="w-1.5 h-1.5 bg-white/70 rounded-full"></div>
+                </div>
+            @endif
         </a>
-        
+
+        {{-- Redes Sociales --}}
         <a href="{{ route('social.index') }}" 
-           class="group flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 hover:text-blue-700 transition-all duration-300 hover:shadow-sm">
-            <div class="p-1.5 bg-gray-100 rounded-lg group-hover:bg-blue-100 transition-colors">
-                <i data-lucide="network" class="w-4 h-4 group-hover:text-blue-600 transition-colors"></i>
+           class="group flex items-center space-x-3 px-4 py-3 rounded-xl 
+                {{ request()->routeIs('social.index') 
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md transform hover:scale-[1.02]' 
+                    : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 hover:text-blue-700 hover:shadow-sm' }} transition-all duration-300">
+            <div class="p-1.5 rounded-lg transition-colors
+                {{ request()->routeIs('social.index') 
+                    ? 'bg-white/20 group-hover:bg-white/30' 
+                    : 'bg-gray-100 group-hover:bg-blue-100' }}">
+                <i data-lucide="network" class="w-4 h-4 transition-colors
+                    {{ request()->routeIs('social.index') ? '' : 'group-hover:text-blue-600' }}"></i>
             </div>
             <span class="font-medium text-sm">Redes Sociales</span>
         </a>
-        
+
+        {{-- Publicaciones --}}
         <a href="{{ route('posts.create') }}" 
-        class="group flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-purple-50 hover:text-purple-700 transition-all duration-300 hover:shadow-sm">
-            <div class="p-1.5 bg-gray-100 rounded-lg group-hover:bg-purple-100 transition-colors">
-                <i data-lucide="edit" class="w-4 h-4 group-hover:text-purple-600 transition-colors"></i>
+           class="group flex items-center space-x-3 px-4 py-3 rounded-xl 
+                {{ request()->routeIs('posts.create') 
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md transform hover:scale-[1.02]' 
+                    : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-purple-50 hover:text-purple-700 hover:shadow-sm' }} transition-all duration-300">
+            <div class="p-1.5 rounded-lg transition-colors
+                {{ request()->routeIs('posts.create') 
+                    ? 'bg-white/20 group-hover:bg-white/30' 
+                    : 'bg-gray-100 group-hover:bg-purple-100' }}">
+                <i data-lucide="edit" class="w-4 h-4 transition-colors
+                    {{ request()->routeIs('posts.create') ? '' : 'group-hover:text-purple-600' }}"></i>
             </div>
             <span class="font-medium text-sm">Publicaciones</span>
         </a>
-        
+
+        {{-- Horarios --}}
         <a href="#" 
            class="group flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-indigo-50 hover:text-indigo-700 transition-all duration-300 hover:shadow-sm">
             <div class="p-1.5 bg-gray-100 rounded-lg group-hover:bg-indigo-100 transition-colors">
@@ -57,7 +85,8 @@
             </div>
             <span class="font-medium text-sm">Horarios</span>
         </a>
-        
+
+        {{-- Cola de Publicaciones --}}
         <a href="#" 
            class="group flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-emerald-50 hover:text-emerald-700 transition-all duration-300 hover:shadow-sm">
             <div class="p-1.5 bg-gray-100 rounded-lg group-hover:bg-emerald-100 transition-colors">
@@ -65,11 +94,19 @@
             </div>
             <span class="font-medium text-sm">Cola de Publicaciones</span>
         </a>
-        
+
+        {{-- Seguridad --}}
         <a href="{{ route('two-factor.show') }}" 
-           class="group flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-amber-50 hover:text-amber-700 transition-all duration-300 hover:shadow-sm">
-            <div class="p-1.5 bg-gray-100 rounded-lg group-hover:bg-amber-100 transition-colors">
-                <i data-lucide="shield-check" class="w-4 h-4 group-hover:text-amber-600 transition-colors"></i>
+           class="group flex items-center space-x-3 px-4 py-3 rounded-xl 
+                {{ request()->routeIs('two-factor.show') 
+                    ? 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white shadow-md transform hover:scale-[1.02]' 
+                    : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-amber-50 hover:text-amber-700 hover:shadow-sm' }} transition-all duration-300">
+            <div class="p-1.5 rounded-lg transition-colors
+                {{ request()->routeIs('two-factor.show') 
+                    ? 'bg-white/20 group-hover:bg-white/30' 
+                    : 'bg-gray-100 group-hover:bg-amber-100' }}">
+                <i data-lucide="shield-check" class="w-4 h-4 transition-colors
+                    {{ request()->routeIs('two-factor.show') ? '' : 'group-hover:text-amber-600' }}"></i>
             </div>
             <span class="font-medium text-sm">Seguridad</span>
         </a>

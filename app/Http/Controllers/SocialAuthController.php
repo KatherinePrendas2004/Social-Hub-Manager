@@ -51,13 +51,9 @@ class SocialAuthController extends Controller
     {
         $account = Auth::user()->socialAccounts()->where('platform', $platform)->first();
         if ($account) {
-            $account->update([
-                'is_active' => false,
-                'disconnected_at' => now(),
-                'access_token' => null,
-                'refresh_token' => null,
-            ]);
+            $account->delete();  // BORRA el registro por completo
         }
-        return redirect()->route('social.index')->with('success', ucfirst($platform) . ' desconectado.');
+        return redirect()->route('social.index')->with('success', ucfirst($platform) . ' desconectado y eliminado.');
     }
+
 }

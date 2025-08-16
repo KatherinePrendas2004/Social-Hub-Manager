@@ -35,9 +35,9 @@
 
             @if($connected && $connected->is_active)
                 <p class="text-sm text-gray-500 mt-2">Conectado como <strong>{{ $connected->platform_username ?? '—' }}</strong></p>
-                <form action="{{ route('social.disconnect', $key) }}" method="POST" class="mt-4">
+                <form action="{{ route('social.disconnect', $key) }}" method="POST" class="mt-4 disconnect-form">
                     @csrf
-                    <button class="px-4 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100">Desconectar</button>
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100">Desconectar</button>
                 </form>
             @else
                 <a href="{{ route('social.redirect', $key) }}" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
@@ -48,4 +48,32 @@
         @endforeach
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const forms = document.querySelectorAll('.disconnect-form');
+
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // evitar submit inmediato
+            
+            Swal.fire({
+                title: '¿Seguro que quieres desconectar esta red social?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, desconectar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
 @endsection
