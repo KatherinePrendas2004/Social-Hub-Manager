@@ -78,21 +78,24 @@
         </a>
 
         {{-- Horarios --}}
-        <a href="#" 
-           class="group flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-indigo-50 hover:text-indigo-700 transition-all duration-300 hover:shadow-sm">
-            <div class="p-1.5 bg-gray-100 rounded-lg group-hover:bg-indigo-100 transition-colors">
-                <i data-lucide="calendar" class="w-4 h-4 group-hover:text-indigo-600 transition-colors"></i>
+        <a href="{{ route('schedules.index') }}" 
+           class="group flex items-center space-x-3 px-4 py-3 rounded-xl 
+                {{ request()->routeIs('schedules.*') 
+                    ? 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white shadow-md transform hover:scale-[1.02]' 
+                    : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-indigo-50 hover:text-indigo-700 hover:shadow-sm' }} transition-all duration-300">
+            <div class="p-1.5 rounded-lg transition-colors
+                {{ request()->routeIs('schedules.*') 
+                    ? 'bg-white/20 group-hover:bg-white/30' 
+                    : 'bg-gray-100 group-hover:bg-indigo-100' }}">
+                <i data-lucide="calendar" class="w-4 h-4 transition-colors
+                    {{ request()->routeIs('schedules.*') ? '' : 'group-hover:text-indigo-600' }}"></i>
             </div>
             <span class="font-medium text-sm">Horarios</span>
-        </a>
-
-        {{-- Cola de Publicaciones --}}
-        <a href="#" 
-           class="group flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-emerald-50 hover:text-emerald-700 transition-all duration-300 hover:shadow-sm">
-            <div class="p-1.5 bg-gray-100 rounded-lg group-hover:bg-emerald-100 transition-colors">
-                <i data-lucide="list" class="w-4 h-4 group-hover:text-emerald-600 transition-colors"></i>
-            </div>
-            <span class="font-medium text-sm">Cola de Publicaciones</span>
+            @if(request()->routeIs('schedules.*'))
+                <div class="ml-auto">
+                    <div class="w-1.5 h-1.5 bg-white/70 rounded-full"></div>
+                </div>
+            @endif
         </a>
 
         {{-- Seguridad --}}

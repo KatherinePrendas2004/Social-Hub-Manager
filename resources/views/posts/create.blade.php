@@ -46,6 +46,19 @@
                 @enderror
             </div>
 
+            <!-- Title Section for Reddit -->
+            <div id="reddit-title-section" class="p-6 border-b border-gray-100 hidden">
+                <label class="block text-sm font-semibold text-gray-900 mb-3">Título para Reddit</label>
+                <input type="text" 
+                       name="reddit_title" 
+                       class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('reddit_title') border-red-300 @enderror"
+                       placeholder="Ingresa el título para tu publicación en Reddit"
+                       value="{{ old('reddit_title') }}">
+                @error('reddit_title')
+                    <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                @enderror
+            </div>
+
             <!-- Platform Selection -->
             <div class="p-6 border-b border-gray-100">
                 <label class="block text-sm font-semibold text-gray-900 mb-4">Selecciona las redes sociales</label>
@@ -124,7 +137,7 @@
                             <input type="checkbox" 
                                    name="platforms[]" 
                                    value="reddit" 
-                                   class="hidden peer"
+                                   class="hidden peer reddit-checkbox"
                                    {{ in_array('reddit', old('platforms', [])) ? 'checked' : '' }}>
                             <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center mr-3 peer-checked:bg-orange-500 peer-checked:text-white transition-colors">
                                 <i data-lucide="disc" class="w-5 h-5 text-orange-600 peer-checked:text-white"></i>
@@ -132,7 +145,7 @@
                             <div class="flex-1">
                                 <p class="font-medium text-gray-900">Reddit</p>
                                 <p class="text-sm text-green-600">✓ Conectado</p>
-                                <p class="text-xs text-gray-500 mt-1">Se publicará en tu primer subreddit disponible</p>
+                                <p class="text-xs text-gray-500 mt-1">Se publicará en tu perfil de Reddit</p>
                             </div>
                             <div class="ml-auto">
                                 <div class="w-5 h-5 border-2 border-gray-300 rounded peer-checked:border-orange-500 peer-checked:bg-orange-500 flex items-center justify-center">
@@ -164,7 +177,7 @@
                 <div class="space-y-3">
                     <!-- Instant -->
                     <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-300 hover:bg-green-50 transition-all has-[:checked]:border-green-500 has-[:checked]:bg-green-50">
-                        <input type="radio" name="type" value="instant" class="hidden peer" checked>
+                        <input type="radio" name="type" value="instant" class="hidden peer publication-type" checked>
                         <div class="w-5 h-5 border-2 border-gray-300 rounded-full mr-4 peer-checked:border-green-500 peer-checked:bg-green-500 flex items-center justify-center">
                             <div class="w-2.5 h-2.5 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
                         </div>
@@ -177,78 +190,107 @@
                         </div>
                     </label>
 
-                    <!-- Queued (Disabled) -->
-                    <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl opacity-50 cursor-not-allowed">
-                        <input type="radio" name="type" value="queued" class="hidden peer" disabled>
-                        <div class="w-5 h-5 border-2 border-gray-300 rounded-full mr-4">
-                            <div class="w-2.5 h-2.5 bg-white rounded-full opacity-0"></div>
+                    <!-- Queued -->
+                    <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition-all has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                        <input type="radio" name="type" value="queued" class="hidden peer publication-type">
+                        <div class="w-5 h-5 border-2 border-gray-300 rounded-full mr-4 peer-checked:border-blue-500 peer-checked:bg-blue-500 flex items-center justify-center">
+                            <div class="w-2.5 h-2.5 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center">
-                                <i data-lucide="clock" class="w-5 h-5 text-gray-400 mr-2"></i>
-                                <span class="font-medium text-gray-600">Enviar a cola</span>
-                                <span class="ml-2 px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded-full">Próximamente</span>
+                                <i data-lucide="clock" class="w-5 h-5 text-blue-600 mr-2"></i>
+                                <span class="font-medium text-gray-900">Enviar a cola</span>
                             </div>
-                            <p class="text-sm text-gray-500 mt-1">Se publicará en el siguiente horario programado</p>
+                            <p class="text-sm text-gray-600 mt-1">Se publicará en el siguiente horario programado</p>
                         </div>
                     </label>
 
-                    <!-- Scheduled (Disabled) -->
-                    <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl opacity-50 cursor-not-allowed">
-                        <input type="radio" name="type" value="scheduled" class="hidden peer" disabled>
-                        <div class="w-5 h-5 border-2 border-gray-300 rounded-full mr-4">
-                            <div class="w-2.5 h-2.5 bg-white rounded-full opacity-0"></div>
+                    <!-- Scheduled -->
+                    <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-indigo-300 hover:bg-indigo-50 transition-all has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50">
+                        <input type="radio" name="type" value="scheduled" class="hidden peer publication-type">
+                        <div class="w-5 h-5 border-2 border-gray-300 rounded-full mr-4 peer-checked:border-indigo-500 peer-checked:bg-indigo-500 flex items-center justify-center">
+                            <div class="w-2.5 h-2.5 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center">
-                                <i data-lucide="calendar" class="w-5 h-5 text-gray-400 mr-2"></i>
-                                <span class="font-medium text-gray-600">Programar</span>
-                                <span class="ml-2 px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded-full">Próximamente</span>
+                                <i data-lucide="calendar" class="w-5 h-5 text-indigo-600 mr-2"></i>
+                                <span class="font-medium text-gray-900">Programar</span>
                             </div>
-                            <p class="text-sm text-gray-500 mt-1">Selecciona una fecha y hora específica</p>
+                            <p class="text-sm text-gray-600 mt-1">Programa la publicación para una fecha y hora específicas</p>
                         </div>
                     </label>
                 </div>
+                @error('type')
+                    <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Scheduled Date/Time Section (Hidden by default) -->
+            <div id="scheduled-section" class="p-6 border-b border-gray-100 hidden">
+                <label class="block text-sm font-semibold text-gray-900 mb-3">Fecha y Hora de Publicación</label>
+                <input type="datetime-local" 
+                       name="scheduled_at" 
+                       class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('scheduled_at') border-red-300 @enderror"
+                       value="{{ old('scheduled_at') }}" 
+                       min="{{ now()->format('Y-m-d\TH:i') }}" /> <!-- Mínimo: ahora para evitar pasado -->
+                @error('scheduled_at')
+                    <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                @enderror
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex items-center justify-between">
-            <button type="button" 
-                    onclick="history.back()" 
-                    class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-colors">
-                Cancelar
-            </button>
+        <!-- Submit Button -->
+        <div class="flex justify-end">
             <button type="submit" 
-                    class="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl font-medium transition-all transform hover:scale-105 shadow-lg">
-                <i data-lucide="send" class="w-5 h-5 mr-2 inline"></i>
-                Publicar Ahora
+                    class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg">
+                Crear Publicación
             </button>
         </div>
     </form>
 </div>
 
 <script>
-// Character counter
-document.addEventListener('DOMContentLoaded', function() {
-    const textarea = document.querySelector('textarea[name="content"]');
-    const charCount = document.getElementById('char-count');
-    
-    function updateCharCount() {
-        const count = textarea.value.length;
-        charCount.textContent = count;
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Character count for content textarea
+        const contentTextarea = document.querySelector('textarea[name="content"]');
+        const charCount = document.getElementById('char-count');
         
-        if (count > 10000) {
-            charCount.className = 'text-red-500';
-        } else if (count > 9000) {
-            charCount.className = 'text-yellow-500';
-        } else {
-            charCount.className = 'text-gray-400';
+        contentTextarea.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+
+        // Show/hide Reddit title section based on Reddit checkbox
+        const redditCheckbox = document.querySelector('.reddit-checkbox');
+        const redditTitleSection = document.getElementById('reddit-title-section');
+        
+        if (redditCheckbox) {
+            redditCheckbox.addEventListener('change', function() {
+                redditTitleSection.classList.toggle('hidden', !this.checked);
+            });
+
+            // Initialize Reddit title section visibility
+            if (redditCheckbox.checked) {
+                redditTitleSection.classList.remove('hidden');
+            }
         }
-    }
-    
-    textarea.addEventListener('input', updateCharCount);
-    updateCharCount();
-});
+
+        // Show/hide scheduled date/time section based on type
+        const publicationTypes = document.querySelectorAll('.publication-type');
+        const scheduledSection = document.getElementById('scheduled-section');
+
+        publicationTypes.forEach(type => {
+            type.addEventListener('change', function() {
+                scheduledSection.classList.toggle('hidden', this.value !== 'scheduled');
+            });
+        });
+
+        // Initialize visibility if old('type') is scheduled
+        if ("{{ old('type') }}" === 'scheduled') {
+            scheduledSection.classList.remove('hidden');
+        }
+    });
 </script>
 @endsection
