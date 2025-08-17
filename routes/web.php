@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PublishScheduleController;
 
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -51,5 +52,22 @@ Route::middleware('auth')->group(function () {
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+    Route::resource('schedules', PublishScheduleController::class);
+    
+    Route::prefix('schedules')->name('schedules.')->group(function () {
+        
+        Route::patch('{schedule}/toggle', [PublishScheduleController::class, 'toggle'])
+            ->name('toggle');
+        
+        Route::get('day/{day}', [PublishScheduleController::class, 'getSchedulesForDay'])
+            ->name('day');
+        
+        Route::post('clone-day', [PublishScheduleController::class, 'cloneDay'])
+            ->name('clone-day');
+        
+        Route::get('stats', [PublishScheduleController::class, 'getStats'])
+            ->name('stats');
+    });
 });
 ?>
