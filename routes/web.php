@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/dashboard/analytics', [DashboardController::class, 'analytics'])->name('dashboard.analytics');
 
     // Two-Factor Authentication Routes
     Route::get('/security', [TwoFactorController::class, 'show'])->name('two-factor.show');
@@ -53,21 +54,28 @@ Route::middleware('auth')->group(function () {
     Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
+    // Publish Schedule Routes
     Route::resource('schedules', PublishScheduleController::class);
     
+    // Rutas adicionales para funcionalidades AJAX
     Route::prefix('schedules')->name('schedules.')->group(function () {
-        
+        // Activar/desactivar horario
         Route::patch('{schedule}/toggle', [PublishScheduleController::class, 'toggle'])
             ->name('toggle');
         
+        // Obtener horarios para un día específico
         Route::get('day/{day}', [PublishScheduleController::class, 'getSchedulesForDay'])
             ->name('day');
         
+        // Clonar horarios de un día a otro
         Route::post('clone-day', [PublishScheduleController::class, 'cloneDay'])
             ->name('clone-day');
         
+        // Obtener estadísticas en tiempo real
         Route::get('stats', [PublishScheduleController::class, 'getStats'])
             ->name('stats');
     });
+
+    Route::post('/dashboard/queue/{queueId}/cancel', [DashboardController::class, 'cancel'])->name('posts.queue.cancel');
 });
 ?>

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StorePostRequest extends FormRequest
 {
@@ -21,6 +22,12 @@ class StorePostRequest extends FormRequest
             'scheduled_at' => 'nullable|date|after:now',
             'media' => 'nullable|array|max:4',
             'media.*' => 'file|mimes:jpg,jpeg,png,gif,mp4,mov|max:10240', // 10MB max
+            'reddit_title' => [
+                Rule::requiredIf(fn () => in_array('reddit', $this->input('platforms', []))),
+                'nullable',
+                'string',
+                'max:300', // Reddit limita los títulos a 300 caracteres
+            ],
         ];
     }
 
@@ -36,6 +43,8 @@ class StorePostRequest extends FormRequest
             'media.max' => 'Puedes subir máximo 4 archivos.',
             'media.*.mimes' => 'Solo se permiten archivos de imagen (jpg, png, gif) o video (mp4, mov).',
             'media.*.max' => 'Cada archivo no puede exceder 10MB.',
+            'reddit_title.required' => 'El título es obligatorio para publicaciones en Reddit.',
+            'reddit_title.max' => 'El título no puede exceder 300 caracteres.',
         ];
     }
 

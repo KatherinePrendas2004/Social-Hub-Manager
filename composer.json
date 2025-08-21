@@ -15,7 +15,7 @@
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.13",
-        "laravel/sail": "^1.41",
+        "laravel/sail": "^1.44",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
         "phpunit/phpunit": "^11.5.3"
@@ -56,6 +56,12 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
+        ],
+        "schedule": [
+            "@php artisan schedule:run"
+        ],
+        "schedule-loop": [
+            "powershell -Command \"while ($true) { Write-Host 'Ejecutando php artisan schedule:run a las $(Get-Date)'; php artisan schedule:run; Start-Sleep -Seconds 60; }\""
         ]
     },
     "extra": {

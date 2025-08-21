@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            // Cambiar la columna status para que soporte todos los valores necesarios
             $table->enum('status', [
                 'draft', 
                 'queued', 
@@ -22,8 +21,7 @@ return new class extends Migration
                 'failed'
             ])->change();
             
-            // O si prefieres usar string con suficiente longitud:
-            // $table->string('status', 20)->change();
+
         });
     }
 
@@ -33,7 +31,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            // Revertir a la definición anterior si es necesario
             $table->string('status', 10)->change();
         });
     }
